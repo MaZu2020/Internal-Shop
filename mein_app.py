@@ -90,7 +90,7 @@ products_path = r"data\produkte.xlsx"
 special_products_path = r"data\produkte special.xlsx"
 orders_path = r"data\bestellungen.xlsx"
 logfile_path = r"data\order_logs.xlsx"  # Einheitlicher Name
-static_folder = r"C:\Users\mzuerche\Desktop\Merch Shop\static"
+static_folder = r"static"
 
 # ---------------------------
 # Lade die Daten
