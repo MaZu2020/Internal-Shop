@@ -85,11 +85,11 @@ def load_data(file_path):
 # ---------------------------
 # Excel-Dateipfade und Static-Folder
 # ---------------------------
-storelist_path = r"C:\Users\mzuerche\Desktop\Merch Shop\data\storelist.xlsx"
-products_path = r"C:\Users\mzuerche\Desktop\Merch Shop\data\produkte.xlsx"
-special_products_path = r"C:\Users\mzuerche\Desktop\Merch Shop\data\produkte special.xlsx"
-orders_path = r"C:\Users\mzuerche\Desktop\Merch Shop\data\bestellungen.xlsx"
-logfile_path = r"C:\Users\mzuerche\Desktop\Merch Shop\data\order_logs.xlsx"  # Einheitlicher Name
+storelist_path = r"data\storelist.xlsx"
+products_path = r"data\produkte.xlsx"
+special_products_path = r"data\produkte special.xlsx"
+orders_path = r"data\bestellungen.xlsx"
+logfile_path = r"data\order_logs.xlsx"  # Einheitlicher Name
 static_folder = r"C:\Users\mzuerche\Desktop\Merch Shop\static"
 
 # ---------------------------
