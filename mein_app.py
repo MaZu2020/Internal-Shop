@@ -85,7 +85,7 @@ def load_data(file_path):
 # ---------------------------
 # Excel-Dateipfade und Static-Folder
 # ---------------------------
-storelist_path = "data/Storelist.xlsx"
+storelist_path = "data/storelist_new.xlsx"
 products_path = "data/produkte.xlsx"
 special_products_path = "data/produkte_special.xlsx"
 orders_path = "data/bestellungen.xlsx"
