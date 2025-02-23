@@ -7,6 +7,10 @@ from datetime import datetime
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, select, insert
 
 # ---------------------------
+# Debugging-Hilfe: Überprüfe das Verzeichnis und die Dateien darin
+st.write("Verzeichnisinhalt:", os.listdir("data"))
+
+# ---------------------------
 # Datenbank-Verbindung und Tabellen-Definition
 # ---------------------------
 # Verbindet sich mit der Datenbank (oder erstellt sie, wenn sie nicht existiert)
@@ -30,18 +34,32 @@ orders_table = Table(
 meta.create_all(engine)
 
 # ---------------------------
-# Funktion zum Laden von Daten
+# Funktion zum Laden von Daten mit Fehlerbehandlung
 # ---------------------------
 @st.cache_data
 def load_data(file_path):
-    return pd.read_excel(file_path)
+    try:
+        df = pd.read_excel(file_path)
+        st.success(f"Datei erfolgreich geladen: {file_path}")
+        return df
+    except FileNotFoundError:
+        st.error(f"Datei nicht gefunden: {file_path}")
+        return pd.DataFrame()
+    except Exception as e:
+        st.error(f"Fehler beim Laden der Datei: {file_path}")
+        st.error(str(e))
+        return pd.DataFrame()
 
 # ---------------------------
-# Excel-Dateipfade
+# Excel-Dateipfade und Überprüfung
 # ---------------------------
-storelist_path = "data/storelist.xlsx"
+storelist_path = "data/storelist_new.xlsx"
 products_path = "data/produkte.xlsx"
 special_products_path = "data/produkte_special.xlsx"
+
+# Überprüfe, ob die Dateien im Verzeichnis vorhanden sind
+st.write("Prüfe Pfad:", storelist_path)
+st.write("Dateien im Verzeichnis:", os.listdir("data"))
 
 # ---------------------------
 # Lade die Daten
@@ -50,7 +68,15 @@ storelist = load_data(storelist_path)
 products = load_data(products_path)
 special_products = load_data(special_products_path)
 
-# Erstelle Mappings:
+# Überprüfe, ob DataFrames geladen wurden
+if storelist.empty:
+    st.warning("Storelist konnte nicht geladen werden.")
+if products.empty:
+    st.warning("Produkte konnten nicht geladen werden.")
+if special_products.empty:
+    st.warning("Spezialprodukte konnten nicht geladen werden.")
+
+# Erstelle Mappings für Store-Auswahl:
 store_mapping = dict(zip(storelist["Storenummer"], storelist["Storename"]))
 
 # ---------------------------
