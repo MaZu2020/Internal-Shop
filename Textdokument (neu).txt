@@ -10,3 +10,9 @@ C:\Users\mzuerche\AppData\Local\Programs\Python\Python313\Scripts\pip install st
 C:\Users\user\AppData\Local\Programs\Python\Python313\Scripts\pip install streamlit
 
 
+
+
+
+
+git push origin main
+
