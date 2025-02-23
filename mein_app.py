@@ -85,12 +85,12 @@ def load_data(file_path):
 # ---------------------------
 # Excel-Dateipfade und Static-Folder
 # ---------------------------
-storelist_path = r"data\storelist.xlsx"
-products_path = r"data\produkte.xlsx"
-special_products_path = r"data\produkte special.xlsx"
-orders_path = r"data\bestellungen.xlsx"
-logfile_path = r"data\order_logs.xlsx"  # Einheitlicher Name
-static_folder = r"static"
+storelist_path = "data/storelist.xlsx"
+products_path = "data/produkte.xlsx"
+special_products_path = "data/produkte special.xlsx"
+orders_path = "data/bestellungen.xlsx"
+logfile_path = "data/order_logs.xlsx"  # Einheitlicher Name
+static_folder = "static"
 
 # ---------------------------
 # Lade die Daten
