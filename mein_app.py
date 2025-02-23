@@ -241,6 +241,21 @@ def download_orders():
 # ---------------------------
 # Funktion: Produkte anzeigen
 # ---------------------------
+# ---------------------------
+# Funktion: Zahlen formatieren (keine Dezimalstelle, wenn nicht nötig)
+# ---------------------------
+def format_number(num):
+    try:
+        if isinstance(num, float) and num.is_integer():
+            return str(int(num))
+        elif isinstance(num, int):
+            return str(num)
+        else:
+            return str(num)
+    except Exception:
+        return str(num)
+
+
 def display_products(product_data, email_mode=False):
     cols = st.columns(3)
     
