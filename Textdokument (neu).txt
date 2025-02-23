@@ -1,0 +1,12 @@
+cd C:\Users\mzuerche\Desktop\Internal Shop
+
+streamlit run mein_app.py
+
+C:\Users\mzuerche\AppData\Local\Programs\Python\Python313
+
+C:\Users\mzuerche\AppData\Local\Programs\Python\Python313\Scripts\pip install streamlit
+
+
+C:\Users\user\AppData\Local\Programs\Python\Python313\Scripts\pip install streamlit
+
+

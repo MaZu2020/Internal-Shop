@@ -1,0 +1,136 @@
+Hier eine detaillierte Erklärung des Codes, der den internen Store Shop mit Streamlit realisiert:
+
+1. Allgemeine Konfiguration und Setup
+Importe
+streamlit as st: Importiert die Bibliothek Streamlit für die Weboberfläche.
+pandas as pd: Importiert die Datenverarbeitungsbibliothek Pandas.
+os, base64, webbrowser: Systemmodule für Dateioperationen, Kodierungen und Webinteraktionen.
+2. Mehrsprachigkeit
+Der Code ermöglicht eine mehrsprachige Oberfläche, unterstützt Deutsch, Englisch, Französisch und Italienisch:
+
+Sprachoptionen sind im LANGUAGES-Dictionary definiert.
+Übersetzungen für UI-Texte stehen im TRANSLATIONS-Dictionary.
+Die Funktion _() übernimmt die Übersetzung für einen bestimmten Schlüssel, z. B.:
+
+python
+Copy
+Edit
+def _(key):
+    return TRANSLATIONS[key][st.session_state.language]
+Sie greift auf die Übersetzung basierend auf der aktuellen Sprache zu.
+
+3. Streamlit-Seitenkonfiguration
+python
+Copy
+Edit
+st.set_page_config(page_title="Interner Store Shop", layout="wide")
+Titel und Layout der Streamlit-App werden hier festgelegt. wide sorgt für eine breitere Darstellung der Inhalte.
+4. Datenladen
+python
+Copy
+Edit
+@st.cache_data
+def load_data(file_path):
+    return pd.read_excel(file_path)
+Die Funktion lädt Excel-Dateien, die später für Store-, Produkt- und Bestellinformationen benötigt werden.
+Dank @st.cache_data werden die Daten im Speicher gehalten und müssen bei erneuten Aufrufen nicht erneut geladen werden.
+
+Excel-Dateipfade:
+
+Store-Liste (storelist.xlsx)
+Produktliste (produkte.xlsx)
+Spezialprodukte (produkte special.xlsx)
+Bestellungen (bestellungen.xlsx)
+5. Store- und Sprachzuordnung
+store_mapping: Verknüpft Store-Nummern mit Store-Namen.
+store_lang_mapping: Verknüpft Store-Nummern mit deren bevorzugter Sprache (z. B. "D" für Deutsch).
+6. Sidebar für Navigation und Store-Auswahl
+In der Sidebar können Nutzer:
+
+Einen Store auswählen.
+Die Sprache wechseln.
+Zwischen den Tabs Produkte und Spezialprodukte navigieren.
+Die Funktion update_language stellt sicher, dass beim Wechsel des Stores auch die richtige Sprache eingestellt wird.
+
+python
+Copy
+Edit
+def update_language():
+    selected_store = st.session_state.selected_store_number
+    store_default = store_lang_mapping[selected_store]
+    if store_default == "D":
+        st.session_state.language = "de"
+    elif store_default == "F":
+        st.session_state.language = "fr"
+    else:
+        st.session_state.language = "en"
+7. Produktanzeige
+Die Produkte werden in einem flexiblen 3-Spalten-Layout dargestellt.
+
+Produkt-Daten
+Der Name, SAP-Nummer, Bemerkungen, Bildname und der Lagerbestand (actual Stock) werden angezeigt.
+Die Bildanzeige erfolgt in einer <div>-Containerstruktur mit einer CSS-Formatierung.
+Die Bilder werden über Base64 kodiert:
+
+python
+Copy
+Edit
+@st.cache_data
+def get_image_base64(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+Lageranzeige
+Wenn der Lagerbestand 0 ist, erscheint ein roter Hinweistext: Nicht verfügbar.
+Bestelloptionen
+Benutzer können die Menge aus mehreren Optionen (Qty 1, Qty 2, ...) auswählen.
+Je nach Tab und Modus (Produkt oder Spezialprodukt) gibt es unterschiedliche Aktionen:
+Normale Produkte: Bestellung speichern
+Spezialprodukte: Email-Bestellung
+8. Bestellvorgänge
+a. Bestellung speichern
+python
+Copy
+Edit
+def save_order(store_number, sap_number, quantity, orders_path):
+    orders_df = pd.read_excel(orders_path, index_col=0)
+    orders_df.at[store_number, sap_number] = quantity
+    orders_df.to_excel(orders_path)
+Die Bestellung wird direkt in der Excel-Datei für Bestellungen gespeichert.
+b. Bestellung per Email
+python
+Copy
+Edit
+def send_email_with_outlook(email_recipient, product_name, sap_number, quantity, store_name, store_number):
+    email_body = f"Hello Team%0A%0A..."
+    mailto_link = f"mailto:{email_recipient}?subject={email_subject}&body={email_body}"
+    webbrowser.open(mailto_link)
+Eine Email wird im Standard-Mailprogramm geöffnet. Dabei werden die Bestelldetails (Produktname, Menge, Store-Infos) übermittelt.
+9. Seiteninhalt
+Je nach gewähltem Tab wird der passende Inhalt angezeigt:
+
+python
+Copy
+Edit
+if selected_tab == _("products"):
+    st.header(_("products"))
+    display_products(products)
+elif selected_tab == _("special_products"):
+    st.header(_("special_products"))
+    display_products(special_products, email_mode=True)
+Tab Produkte: Normale Produkte mit der Möglichkeit zur direkten Bestellung.
+Tab Spezialprodukte: Produkte, die nur per Email bestellt werden können.
+10. Zusammenfassung
+Der Code realisiert einen internen Store Shop mit folgenden Funktionen:
+
+Mehrsprachige Oberfläche (DE, EN, FR, IT)
+Dynamische Store- und Sprachverwaltung
+Produktanzeige mit Bildern, Lagerstatus und Bestelloptionen
+Speicherung der Bestellungen oder Versand per Email
+Durch die Nutzung von Streamlit bietet der Shop eine einfache und interaktive Weboberfläche für Mitarbeiter.
+
+
+
+
+
+
+
