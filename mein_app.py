@@ -87,7 +87,7 @@ def load_data(file_path):
 # ---------------------------
 storelist_path = "data/storelist.xlsx"
 products_path = "data/produkte.xlsx"
-special_products_path = "data/produkte special.xlsx"
+special_products_path = "data/produkte_special.xlsx"
 orders_path = "data/bestellungen.xlsx"
 logfile_path = "data/order_logs.xlsx"  # Einheitlicher Name
 static_folder = "static"
