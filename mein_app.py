@@ -276,7 +276,7 @@ def display_products(product_data, email_mode=False):
             with img_col:
                 image_name = str(row["Bildname"])
                 image_path = os.path.join(static_folder, image_name)
-                st.write(f"Image path: {image_path}")  # Debugging-Hilfe
+                'st.write(f"Image path: {image_path}")  # Debugging-Hilfe
                 if os.path.exists(image_path):
                     image_base64 = get_image_base64(image_path)
                     st.markdown(f"""
