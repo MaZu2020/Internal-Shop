@@ -271,22 +271,26 @@ def display_products(product_data, email_mode=False):
             else:
                 st.markdown("<p style='font-size: small;'>&nbsp;</p>", unsafe_allow_html=True)
 
-            # Layout mit Bild und Benachrichtigungen in einer Zeile
-            img_col, msg_col = st.columns([1, 2])
-            with img_col:
-                image_name = str(row["Bildname"])
-                image_path = os.path.join(static_folder, image_name)
-                if os.path.exists(image_path):
-                    image_base64 = get_image_base64(image_path)
-                    st.markdown(f"""
-                        <div>
-                            <img src="data:image/png;base64,{image_base64}" 
-                                 alt="{row['Name']}" 
-                                 style="width: {image_width}; height: {image_height}; object-fit: cover;">
-                        </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.warning(f"Bild nicht gefunden: {image_name}")
+           # Layout mit Bild und Benachrichtigungen in einer Zeile
+img_col, msg_col = st.columns([1, 2])
+with img_col:
+    image_name = str(row["Bildname"])
+    image_path = os.path.join(static_folder, image_name)
+    # Entferne oder kommentiere die folgende Zeile:
+    # st.write(f"Image path: {image_path}")  # Debugging-Hilfe
+    if os.path.exists(image_path):
+        image_base64 = get_image_base64(image_path)
+        st.markdown(f"""
+            <div>
+                <img src="data:image/png;base64,{image_base64}" 
+                     alt="{row['Name']}" 
+                     style="width: {image_width}; height: {image_height}; object-fit: cover;">
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.warning(f"Bild nicht gefunden: {image_name}")
+
+
 
             with msg_col:
                 if email_mode and st.session_state.get(f"email_sent_{index}", False):
