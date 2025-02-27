@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 import base64
-import webbrowser
 from datetime import datetime
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, select, insert
 
@@ -205,57 +204,10 @@ st.markdown(f"""
 def get_image_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
-    # ---------------------------
-# Funktion: Bestellung speichern
-# ---------------------------
-def save_order(store_number, sap_number, product_name, quantity):
-    with engine.connect() as conn:
-        stmt = insert(orders_table).values(
-            Datum=datetime.now().strftime("%Y-%m-%d"),
-            Storenummer=store_number,
-            Produktname=product_name,
-            SAP_Nummer=sap_number,
-            Anzahl=quantity
-        )
-        conn.execute(stmt)
-        conn.commit()
-    st.success(_("order_success"))
-
-# ---------------------------
-# Funktion: Alle Bestellungen anzeigen
-# ---------------------------
-def get_orders():
-    with engine.connect() as conn:
-        stmt = select([orders_table])
-        result = conn.execute(stmt)
-        orders = result.fetchall()
-    return orders
-
-# ---------------------------
-# Funktion: Bestellungen als DataFrame herunterladen
-# ---------------------------
-def download_orders():
-    df = pd.read_sql_table('bestellungen', engine)
-    return df
 
 # ---------------------------
 # Funktion: Produkte anzeigen
 # ---------------------------
-# ---------------------------
-# Funktion: Zahlen formatieren (keine Dezimalstelle, wenn nicht nötig)
-# ---------------------------
-def format_number(num):
-    try:
-        if isinstance(num, float) and num.is_integer():
-            return str(int(num))
-        elif isinstance(num, int):
-            return str(num)
-        else:
-            return str(num)
-    except Exception:
-        return str(num)
-
-
 def display_products(product_data, email_mode=False):
     cols = st.columns(3)
     
@@ -263,7 +215,6 @@ def display_products(product_data, email_mode=False):
         col = cols[index % 3]
         with col:
             st.markdown("<div class='product-container'>", unsafe_allow_html=True)
-
             st.markdown(f"<h5>{row['Name']}</h5>", unsafe_allow_html=True)
 
             if not pd.isna(row.get("Bemerkungen", "")) and str(row["Bemerkungen"]).strip():
@@ -271,103 +222,19 @@ def display_products(product_data, email_mode=False):
             else:
                 st.markdown("<p style='font-size: small;'>&nbsp;</p>", unsafe_allow_html=True)
 
-# Layout mit Bild und Benachrichtigungen in einer Zeile
-img_col, msg_col = st.columns([1, 2])
-with img_col:
-    image_name = str(row["Bildname"])
-    image_path = os.path.join(static_folder, image_name)
-    # Entferne oder kommentiere die folgende Zeile:
-    # st.write(f"Image path: {image_path}")  # Debugging-Hilfe
-    if os.path.exists(image_path):
-        image_base64 = get_image_base64(image_path)
-        st.markdown(f"""
-            <div>
-                <img src="data:image/png;base64,{image_base64}" 
-                     alt="{row['Name']}" 
-                     style="width: {image_width}; height: {image_height}; object-fit: cover;">
-            </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.warning(f"Bild nicht gefunden: {image_name}")
-
-with msg_col:
-    if email_mode and st.session_state.get(f"email_sent_{index}", False):
-        st.info("Email window opened.")
-    elif not email_mode and st.session_state.get(f"order_saved_{index}", False):
-        st.success(_("order_success"))
-
-
-            # SAP-Nummer anzeigen, falls vorhanden
-            if 'SAP Number' in row and not pd.isna(row['SAP Number']):
-                sap_number = format_number(row['SAP Number'])
-                sap_text = f"**SAP Nummer:** {sap_number}"
-                st.markdown(sap_text, unsafe_allow_html=True)
-
-            # Stock-Wert formatieren
-            stock_val = format_number(row['actual Stock'])
-            stock_text = f"**Stock:** {stock_val}"
-            if row['actual Stock'] == 0:
-                stock_text += f" <span class='not-available-text'>({_('not_available')})</span>"
-            st.markdown(stock_text, unsafe_allow_html=True)
-
-            qty_options = [qty for qty in [row.get("Qty 1"), row.get("Qty 2"), row.get("Qty 3"), row.get("Qty 4")] if not pd.isna(qty)]
+            image_name = str(row["Bildname"])
+            image_path = os.path.join(static_folder, image_name)
+            if os.path.exists(image_path):
+                image_base64 = get_image_base64(image_path)
+                st.markdown(f"""
+                    <div>
+                        <img src="data:image/png;base64,{image_base64}" 
+                             alt="{row['Name']}" 
+                             style="width: {image_width}; height: {image_height}; object-fit: cover;">
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.warning(f"Bild nicht gefunden: {image_name}")
             
-            if qty_options:
-                qty_selected = st.selectbox(
-                    _("order"),
-                    options=qty_options,
-                    format_func=format_number,
-                    key=f"qty_{index}",
-                    disabled=(row['actual Stock'] == 0)
-                )
-
-                if email_mode:
-                    if st.button(f"{_('order')}: {row['Name']}", key=f"email_{index}", disabled=(row['actual Stock'] == 0)):
-                        send_email_with_outlook(
-                            row['Mail'], row['Name'], row['SAP Number'],
-                            qty_selected, selected_store_name, selected_store_number
-                        )
-                        st.session_state[f"email_sent_{index}"] = True
-                        st.rerun()
-                else:
-                    if st.button(f"{_('order')}: {row['Name']}", key=f"save_{index}", disabled=(row['actual Stock'] == 0)):
-                        save_order(selected_store_number, row["SAP Number"], row["Name"], qty_selected)
-                        st.session_state[f"order_saved_{index}"] = True
-                        st.rerun()
-
             st.markdown("</div>", unsafe_allow_html=True)
             st.markdown("<hr style='border: 1px solid #ddd; margin: 20px 0;'>", unsafe_allow_html=True)
-
-# ---------------------------
-# Seiteninhalt anzeigen
-# ---------------------------
-if selected_tab == _("products"):
-    st.header(_("products"))
-    display_products(products)
-elif selected_tab == _("special_products"):
-    st.header(_("special_products"))
-    display_products(special_products, email_mode=True)
-else:
-    st.header("Alle Bestellungen")
-    orders = get_orders()
-    orders_df = pd.DataFrame(orders, columns=['ID', 'Datum', 'Storenummer', 'Produktname', 'SAP Nummer', 'Anzahl'])
-    st.dataframe(orders_df)
-
-    st.subheader("Bestellungen herunterladen")
-    orders_df = download_orders()
-
-    # Download als Excel
-    st.download_button(
-        label="Bestellungen als Excel herunterladen",
-        data=orders_df.to_excel(index=False),
-        file_name="bestellungen.xlsx"
-    )
-
-    # Download als CSV
-    st.download_button(
-        label="Bestellungen als CSV herunterladen",
-        data=orders_df.to_csv(index=False),
-        file_name="bestellungen.csv"
-    )
-
-
