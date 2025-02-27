@@ -271,7 +271,7 @@ def display_products(product_data, email_mode=False):
             else:
                 st.markdown("<p style='font-size: small;'>&nbsp;</p>", unsafe_allow_html=True)
 
-           # Layout mit Bild und Benachrichtigungen in einer Zeile
+# Layout mit Bild und Benachrichtigungen in einer Zeile
 img_col, msg_col = st.columns([1, 2])
 with img_col:
     image_name = str(row["Bildname"])
@@ -290,13 +290,12 @@ with img_col:
     else:
         st.warning(f"Bild nicht gefunden: {image_name}")
 
+with msg_col:
+    if email_mode and st.session_state.get(f"email_sent_{index}", False):
+        st.info("Email window opened.")
+    elif not email_mode and st.session_state.get(f"order_saved_{index}", False):
+        st.success(_("order_success"))
 
-
-            with msg_col:
-                if email_mode and st.session_state.get(f"email_sent_{index}", False):
-                    st.info("Email window opened.")
-                elif not email_mode and st.session_state.get(f"order_saved_{index}", False):
-                    st.success(_("order_success"))
 
             # SAP-Nummer anzeigen, falls vorhanden
             if 'SAP Number' in row and not pd.isna(row['SAP Number']):
