@@ -238,3 +238,40 @@ def display_products(product_data, email_mode=False):
             
             st.markdown("</div>", unsafe_allow_html=True)
             st.markdown("<hr style='border: 1px solid #ddd; margin: 20px 0;'>", unsafe_allow_html=True)
+
+# ---------------------------
+# Seiteninhalt anzeigen
+# ---------------------------
+if selected_tab == _("products"):
+    st.header(_("products"))
+    display_products(products)
+elif selected_tab == _("special_products"):
+    st.header(_("special_products"))
+    display_products(special_products, email_mode=True)
+else:
+    st.header("Alle Bestellungen")
+    orders = get_orders()
+    orders_df = pd.DataFrame(orders, columns=['ID', 'Datum', 'Storenummer', 'Produktname', 'SAP Nummer', 'Anzahl'])
+    st.dataframe(orders_df)
+
+    st.subheader("Bestellungen herunterladen")
+    orders_df = download_orders()
+
+    # Download als Excel
+    st.download_button(
+        label="Bestellungen als Excel herunterladen",
+        data=orders_df.to_excel(index=False),
+        file_name="bestellungen.xlsx"
+    )
+
+    # Download als CSV
+    st.download_button(
+        label="Bestellungen als CSV herunterladen",
+        data=orders_df.to_csv(index=False),
+        file_name="bestellungen.csv"
+    )
+
+
+
+
+
